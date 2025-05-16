@@ -4,3 +4,190 @@ GET {{AgroMonitor_HostAddress}}/weatherforecast/
 Accept: application/json
 
 ###
+
+GET {{AgroMonitor_HostAddress}}/api/device
+
+###
+
+GET {{AgroMonitor_HostAddress}}/api/device
+
+###
+
+@id=0
+GET {{AgroMonitor_HostAddress}}/api/sensorreadings/{{id}}
+
+###
+
+GET {{AgroMonitor_HostAddress}}/api/sensorreadings
+
+###
+
+GET {{AgroMonitor_HostAddress}}/api/sensorreadings
+
+###
+
+POST {{AgroMonitor_HostAddress}}/api/device
+Content-Type: application/json
+{
+    "deviceIdentifier" : "0345",
+    "name" : "Arduino",
+    "location" : "Naguru"
+}
+
+###
+
+POST {{AgroMonitor_HostAddress}}/api/device
+Content-Type: application/json
+
+{
+      "deviceIdentifier" : "0675",
+      "name" : "Arduino",
+      "location" : "Naguru"
+}
+
+###
+
+POST {{AgroMonitor_HostAddress}}/api/device
+Content-Type: application/json
+
+{
+      "deviceIdentifier" : "0903",
+      "name" : "Rasberry PI 4",
+      "location" : "Kisaasi"
+}
+
+###
+
+DELETE {{AgroMonitor_HostAddress}}/api/device/{{3}}
+
+###
+
+DELETE {{AgroMonitor_HostAddress}}/api/device/3
+
+###
+
+POST {{AgroMonitor_HostAddress}}/api/device
+Content-Type: application/json
+
+{
+      "deviceIdentifier" : "0582",
+      "name" : "Rasberry PI 3",
+      "location" : "Bukoto"
+}
+
+###
+
+GET {{AgroMonitor_HostAddress}}/api/device
+
+###
+
+GET {{AgroMonitor_HostAddress}}/api/device/4
+
+
+###
+
+GET {{AgroMonitor_HostAddress}}/api/sensorreadings
+
+###
+
+POST {{AgroMonitor_HostAddress}}/api/sensorreadings
+Content-Type: application/json
+
+{
+  "deviceIdentifier": "0675",
+  "readings": [
+    {
+      "sensorType": "moisture",
+      "value": 45.5
+    },
+    {
+      "sensorType": "temperature",
+      "value": 25.0
+    },
+    {
+        "sensorType" : "humidity",
+        "value" : 30
+    }
+  ]
+}
+
+###
+
+POST {{AgroMonitor_HostAddress}}/api/sensorreadings
+Content-Type: application/json
+
+{
+  "deviceIdentifier": "0345",
+  "readings": [
+    {
+      "sensorType": "moisture",
+      "value": 50.4
+    },
+    {
+      "sensorType": "temperature",
+      "value": 27.9
+    },
+    {
+        "sensorType" : "humidity",
+        "value" : 18
+    }
+  ]
+}
+
+###
+
+GET {{AgroMonitor_HostAddress}}/api/sensorreadings
+
+###
+
+POST {{AgroMonitor_HostAddress}}/api/sensorreadings
+Content-Type: application/json
+
+{
+  "deviceIdentifier": "0582",
+  "readings": [
+    {
+      "sensorType": "moisture",
+      "value": 52.7
+    },
+    {
+      "sensorType": "temperature",
+      "value": 28.9
+    },
+    {
+        "sensorType" : "humidity",
+        "value" : 2
+    }
+  ]
+}
+
+###
+
+POST {{AgroMonitor_HostAddress}}/api/device
+Content-Type: application/json
+
+{
+  
+      "deviceIdentifier" : "0309",
+      "name" : "Esp 32",
+      "location" : "Kira"
+}
+
+###
+
+GET {{AgroMonitor_HostAddress}}/api/device
+
+###
+
+POST {{AgroMonitor_HostAddress}}/api/sensorreadings
+Content-Type: application/json
+
+{
+  //SensorDataPayload
+}
+
+###
+
+GET {{AgroMonitor_HostAddress}}/api/sensorreadings/3
+
+###
