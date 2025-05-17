@@ -191,3 +191,39 @@ Content-Type: application/json
 GET {{AgroMonitor_HostAddress}}/api/sensorreadings/3
 
 ###
+
+GET {{AgroMonitor_HostAddress}}/api/device
+
+###
+
+GET {{AgroMonitor_HostAddress}}/api/device
+
+###
+
+GET {{AgroMonitor_HostAddress}}/api/device
+
+###
+
+GET {{AgroMonitor_HostAddress}}/api/device
+
+###
+
+GET {{AgroMonitor_HostAddress}}/api/device
+
+###
+
+GET {{AgroMonitor_HostAddress}}/api/device
+
+###
+
+GET {{AgroMonitor_HostAddress}}/api/sensorreadings/3
+
+###
+
+GET {{AgroMonitor_HostAddress}}/api/sensorreadings
+
+###
+
+GET {{AgroMonitor_HostAddress}}/api/sensorreadings/{{id}}
+
+###
