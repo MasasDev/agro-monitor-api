@@ -68,7 +68,7 @@ namespace AgroMonitor.Controllers
                 return BadRequest();
             }
 
-            var device = await _db.Devices.FirstOrDefaultAsync(d => d.DeviceIdentifier == payload.DeviceIdentifier);
+            var device = await _db.Devices.FirstOrDefaultAsync(d => d.DeviceUniqueIdentifier == payload.DeviceIdentifier);
 
             if (device == null)
             {

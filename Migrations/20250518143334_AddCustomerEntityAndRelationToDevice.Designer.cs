@@ -3,6 +3,7 @@ using System;
 using AgroMonitor.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace AgroMonitor.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250518143334_AddCustomerEntityAndRelationToDevice")]
+    partial class AddCustomerEntityAndRelationToDevice
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -30,11 +33,8 @@ namespace AgroMonitor.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
-                    b.Property<string>("CustomerUniqueIdentifier")
-                        .IsRequired()
-                        .HasColumnType("text");
-
                     b.Property<string>("Email")
+                        .IsRequired()
                         .HasColumnType("text");
 
                     b.Property<DateTime?>("EquipmentReturnDate")
@@ -60,9 +60,6 @@ namespace AgroMonitor.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("CustomerUniqueIdentifier")
-                        .IsUnique();
-
                     b.ToTable("Customers");
                 });
 
@@ -77,7 +74,7 @@ namespace AgroMonitor.Migrations
                     b.Property<int>("CustomerId")
                         .HasColumnType("integer");
 
-                    b.Property<string>("DeviceUniqueIdentifier")
+                    b.Property<string>("DeviceIdentifier")
                         .IsRequired()
                         .HasColumnType("text");
 

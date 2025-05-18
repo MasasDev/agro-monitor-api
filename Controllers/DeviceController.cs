@@ -28,7 +28,7 @@ namespace AgroMonitor.Controllers
 
             DeviceDTO deviceDTO = new DeviceDTO
             {
-                DeviceIdentifier = device.DeviceIdentifier,
+                DeviceIdentifier = device.DeviceUniqueIdentifier,
                 Name = device.Name,
                 Location = device.Location,
                 RegistrationDate = device.RegistrationDate,
@@ -51,7 +51,7 @@ namespace AgroMonitor.Controllers
         {
             var devices = await _db.Devices.Include(_ => _.Readings).Select(d => new DeviceDTO
             {
-                DeviceIdentifier = d.DeviceIdentifier,
+                DeviceIdentifier = d.DeviceUniqueIdentifier,
                 Name = d.Name,
                 Location = d.Location,
                 RegistrationDate = d.RegistrationDate,
@@ -79,14 +79,14 @@ namespace AgroMonitor.Controllers
             {
                 return BadRequest("The device must have a unique identifier.");
             }
-            if (await _db.Devices.AnyAsync(d => d.DeviceIdentifier == registerDeviceDTO.DeviceIdentifier))
+            if (await _db.Devices.AnyAsync(d => d.DeviceUniqueIdentifier == registerDeviceDTO.DeviceIdentifier))
             {
                 return Conflict("A device with this identifier already exists.");
             }
 
             Device newDevice = new Device
             {
-                DeviceIdentifier = registerDeviceDTO.DeviceIdentifier,
+                DeviceUniqueIdentifier = registerDeviceDTO.DeviceIdentifier,
                 Name = registerDeviceDTO.Name,
                 Location = registerDeviceDTO.Location,
                 RegistrationDate = DateTime.UtcNow,
@@ -95,7 +95,7 @@ namespace AgroMonitor.Controllers
             await _db.Devices.AddAsync(newDevice);
             await _db.SaveChangesAsync();
 
-            return CreatedAtAction(nameof(GetDevice), new { id = newDevice.Id }, newDevice.DeviceIdentifier);
+            return CreatedAtAction(nameof(GetDevice), new { id = newDevice.Id }, newDevice.DeviceUniqueIdentifier);
         }
 
         [HttpDelete("{id}")]

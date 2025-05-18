@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace AgroMonitor.Models
 {
@@ -7,12 +8,16 @@ namespace AgroMonitor.Models
         [Key]
         public int Id { get; set; }
         [Required]
-        public string DeviceIdentifier { get; set; } = string.Empty;
+        public string DeviceUniqueIdentifier { get; set; } = null!;
         [Required]
         public string Name { get; set; } = string.Empty;
         [Required]
         public string Location { get; set; } = string.Empty;
         public DateTime RegistrationDate { get; set; }
         public List<SensorReading> Readings { get; set; } = new List<SensorReading>();
+
+        [ForeignKey("Customer")]
+        public int CustomerId { get; set; }
+        public Customer Customer { get; set; } = null!;
     }
 }

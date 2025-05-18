@@ -37,7 +37,7 @@ namespace AgroMonitor.Controllers
 
             string extractedDeviceIdentifier = data[0].Substring(9, data[0].Length - 9);
 
-            var device = await _db.Devices.FirstOrDefaultAsync(d => d.DeviceIdentifier == extractedDeviceIdentifier);
+            var device = await _db.Devices.FirstOrDefaultAsync(d => d.DeviceUniqueIdentifier == extractedDeviceIdentifier);
 
             if(device == null)
             {
