@@ -1,4 +1,5 @@
-﻿using AgroMonitor.Data;
+﻿using System.Text.Json.Serialization;
+using AgroMonitor.Data;
 using AgroMonitor.DTOs;
 using AgroMonitor.Models;
 using Microsoft.AspNetCore.Mvc;
@@ -18,14 +19,14 @@ namespace AgroMonitor.Controllers
         }
 
         [HttpPost]
-        public async Task<ActionResult> ReceiveIncomingMessage([FromForm]IncomingMessage incomingMessage)
+        public async Task<ActionResult> ReceiveIncomingMessage([FromBody]IncomingMessage incomingMessage)
         {
             if (incomingMessage == null)
             {
                 return BadRequest("No incoming message");
             }
 
-            String message = incomingMessage.Body;
+            String message = incomingMessage.Message;
 
             if (!message.ToLower().StartsWith("deviceid="))
             {
@@ -73,9 +74,26 @@ namespace AgroMonitor.Controllers
 
         public class IncomingMessage
         {
-            public string From { get; set; }
-            public string To { get; set; }
-            public string Body { get; set; }
+            [JsonPropertyName("smsId")]
+            public string SmsId { get; set; }
+
+            [JsonPropertyName("sender")]
+            public string Sender { get; set; }
+
+            [JsonPropertyName("message")]
+            public string Message { get; set; }
+
+            [JsonPropertyName("receivedAt")]
+            public DateTime ReceivedAt { get; set; }
+
+            [JsonPropertyName("deviceId")]
+            public string DeviceId { get; set; }
+
+            [JsonPropertyName("webhookSubscriptionId")]
+            public string WebhookSubscriptionId { get; set; }
+
+            [JsonPropertyName("webhookEvent")]
+            public string WebhookEvent { get; set; }
         }
     }
 }
