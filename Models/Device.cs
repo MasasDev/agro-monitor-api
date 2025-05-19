@@ -11,13 +11,7 @@ namespace AgroMonitor.Models
         public string DeviceUniqueIdentifier { get; set; } = null!;
         [Required]
         public string Name { get; set; } = string.Empty;
-        [Required]
-        public string Location { get; set; } = string.Empty;
         public DateTime RegistrationDate { get; set; }
         public List<SensorReading> Readings { get; set; } = new List<SensorReading>();
-
-        [ForeignKey("Customer")]
-        public int CustomerId { get; set; }
-        public Customer Customer { get; set; } = null!;
     }
 }

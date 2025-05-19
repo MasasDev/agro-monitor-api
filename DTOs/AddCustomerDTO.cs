@@ -1,6 +1,4 @@
-﻿using AgroMonitor.Models;
-
-namespace AgroMonitor.DTOs
+﻿namespace AgroMonitor.DTOs
 {
     public class AddCustomerDTO
     {
@@ -8,6 +6,5 @@ namespace AgroMonitor.DTOs
         public string PhoneNumber { get; set; } = null!;
         public string? Email { get; set; }
         public string FarmLocation { get; set; } = null!;
-        public List<Device> Equipment { get; set; } = new List<Device>();
     }
 }

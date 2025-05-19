@@ -1,8 +1,5 @@
-﻿using System.Net.NetworkInformation;
-using System.Reflection.Metadata.Ecma335;
-using AgroMonitor.Data;
+﻿using AgroMonitor.Data;
 using AgroMonitor.DTOs;
-using AgroMonitor.Migrations;
 using AgroMonitor.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -23,7 +20,7 @@ namespace AgroMonitor.Controllers
         [HttpGet("{id}")]
         public async Task<ActionResult<CustomerDTO>> GetCustomer(int id)
         {
-            var customer = await _db.Customers.FirstOrDefaultAsync(c => c.Id == id);
+            var customer = await _db.Customers.Include(c => c.RentedDevices).FirstOrDefaultAsync(c => c.Id == id);
 
             if(customer == null)
             {
@@ -38,10 +35,11 @@ namespace AgroMonitor.Controllers
         [HttpGet]
         public async Task<ActionResult<List<CustomerDTO>>> GetCustomers()
         {
-            List<CustomerDTO> customers = await _db.Customers.Select(c => ToCustomerDTO(c)).ToListAsync();
+            List<CustomerDTO> customers = await _db.Customers.Include(c => c.RentedDevices).Select(c => ToCustomerDTO(c)).ToListAsync();
 
             return Ok(customers);
         }
+
         [HttpPost]
         public async Task<ActionResult<AddCustomerDTO>> AddCustomer([FromBody] AddCustomerDTO addCustomerDTO)
         {
@@ -55,24 +53,21 @@ namespace AgroMonitor.Controllers
                 return BadRequest("The customer is missing important details");
             }
 
-            string uniqueIdentifier = Guid.NewGuid().ToString("N")[..10].ToUpper();
+            string customerUniqueIdentifier = Guid.NewGuid().ToString("N")[..10].ToUpper();
 
-            while(await _db.Customers.AnyAsync(c => c.CustomerUniqueIdentifier == uniqueIdentifier))
+            while(await _db.Customers.AnyAsync(c => c.CustomerUniqueIdentifier == customerUniqueIdentifier))
             {
-                uniqueIdentifier = Guid.NewGuid().ToString("N")[..10].ToUpper();
+                customerUniqueIdentifier = Guid.NewGuid().ToString("N")[..10].ToUpper();
             }
 
             Customer newCustomer = new Customer
             {
+                CustomerUniqueIdentifier = customerUniqueIdentifier,
                 Name = addCustomerDTO.Name,
                 PhoneNumber = addCustomerDTO.PhoneNumber,
-                CustomerUniqueIdentifier = uniqueIdentifier,
                 Email = addCustomerDTO.Email,
-                Equipment = addCustomerDTO.Equipment,
-                EquipmentReturnDate = null,
-                RegistrationDate = DateTime.UtcNow,
                 FarmLocation = addCustomerDTO.FarmLocation,
-                IsEquipmentReturned = false,
+                RegistrationDate = DateTime.UtcNow,
             };
 
             await _db.Customers.AddAsync(newCustomer);
@@ -86,20 +81,20 @@ namespace AgroMonitor.Controllers
                 return StatusCode(500, "A unique identifier collision occurred. Please try again.");
             }
 
-            return CreatedAtAction(nameof(GetCustomer), new {newCustomer.Id, newCustomer.CustomerUniqueIdentifier}, ToCustomerDTO(newCustomer));
-
+            return CreatedAtAction(nameof(GetCustomer), new {newCustomer.Id}, ToCustomerDTO(newCustomer));
         }
+
         [HttpPut("{id}")]
         public async Task<ActionResult> UpdateCustomer(long id, UpdateCustomerDTO updateCustomerDTO)
         {
-            if(id != updateCustomerDTO.Id)
-            {
-                return BadRequest("The ID in the route does not match the ID in the payload.");
-            }
-
             if (updateCustomerDTO == null)
             {
                 return BadRequest("Update payload is missing.");
+            }
+
+            if (id != updateCustomerDTO.Id)
+            {
+                return BadRequest("The ID in the route does not match the ID in the payload.");
             }
 
             var customer = await _db.Customers.FirstOrDefaultAsync(c => c.Id == id);
@@ -109,16 +104,9 @@ namespace AgroMonitor.Controllers
                 return BadRequest("This customer does not exist in the system");
             }
 
-            if(updateCustomerDTO.IsEquipmentReturned)
-            {
-                customer.EquipmentReturnDate = DateTime.UtcNow;
-            }
-
             customer.Name = updateCustomerDTO.Name;
             customer.PhoneNumber = updateCustomerDTO.PhoneNumber;
-            customer.Equipment = updateCustomerDTO.Equipment;
             customer.Email = updateCustomerDTO.Email;
-            customer.IsEquipmentReturned = updateCustomerDTO.IsEquipmentReturned;
             customer.FarmLocation = updateCustomerDTO.FarmLocation;
 
             _db.Customers.Update(customer);
@@ -151,10 +139,22 @@ namespace AgroMonitor.Controllers
                 Name = customer.Name,
                 PhoneNumber = customer.PhoneNumber,
                 Email = customer.Email,
-                Equipment = customer.Equipment,
-                EquipmentReturnDate = customer.EquipmentReturnDate,
+                RentedDevices = customer.RentedDevices.Select(d => new DeviceDTO
+                {
+                    Name = d.Name,
+                    DeviceUniqueIdentifier = d.DeviceUniqueIdentifier,
+                    RegistrationDate = d.RegistrationDate,
+                    Readings = d.Readings.Select(r => new SensorReadingDTO
+                    {
+                        SensorType = r.SensorType,
+                        SensorValue = r.SensorValue,
+                        Timestamp = r.TimeStamp,
+                        DeviceName = d.Name
+                    }).ToList(),
+                }).ToList(),
+                RentedDevicesReturnDate = customer.RentedDevicesReturnDate,
                 FarmLocation = customer.FarmLocation,
-                IsEquipmentReturned = customer.IsEquipmentReturned,
+                AreRentedDevicesReturned = customer.AreRentedDevicesReturned,
                 RegistrationDate = customer.RegistrationDate,
             };
         }

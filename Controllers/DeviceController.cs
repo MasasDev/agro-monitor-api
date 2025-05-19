@@ -28,9 +28,8 @@ namespace AgroMonitor.Controllers
 
             DeviceDTO deviceDTO = new DeviceDTO
             {
-                DeviceIdentifier = device.DeviceUniqueIdentifier,
+                DeviceUniqueIdentifier = device.DeviceUniqueIdentifier,
                 Name = device.Name,
-                Location = device.Location,
                 RegistrationDate = device.RegistrationDate,
                 Readings = device.Readings.Select(r => new SensorReadingDTO
                 {
@@ -40,7 +39,6 @@ namespace AgroMonitor.Controllers
                     DeviceName = device.Name
 
                 }).ToList()
-
             };
 
             return Ok(deviceDTO);
@@ -51,9 +49,8 @@ namespace AgroMonitor.Controllers
         {
             var devices = await _db.Devices.Include(_ => _.Readings).Select(d => new DeviceDTO
             {
-                DeviceIdentifier = d.DeviceUniqueIdentifier,
+                DeviceUniqueIdentifier = d.DeviceUniqueIdentifier,
                 Name = d.Name,
-                Location = d.Location,
                 RegistrationDate = d.RegistrationDate,
                 Readings = d.Readings.Select(r => new SensorReadingDTO
                 {
@@ -68,27 +65,27 @@ namespace AgroMonitor.Controllers
 
             return Ok(devices);
         }
+
         [HttpPost]
-        public async Task<ActionResult<string>> RegisterDevice([FromBody] RegisterDeviceDTO registerDeviceDTO)
+        public async Task<ActionResult<string>> AddDevice([FromBody] AddDeviceDTO addDeviceDTO)
         {
-            if (registerDeviceDTO == null)
+            if (addDeviceDTO == null)
             {
-                return BadRequest();
+                return BadRequest("The payload is missing");
             }
-            if (string.IsNullOrWhiteSpace(registerDeviceDTO.DeviceIdentifier))
+            if (string.IsNullOrWhiteSpace(addDeviceDTO.DeviceUniqueIdentifier))
             {
                 return BadRequest("The device must have a unique identifier.");
             }
-            if (await _db.Devices.AnyAsync(d => d.DeviceUniqueIdentifier == registerDeviceDTO.DeviceIdentifier))
+            if (await _db.Devices.AnyAsync(d => d.DeviceUniqueIdentifier == addDeviceDTO.DeviceUniqueIdentifier))
             {
                 return Conflict("A device with this identifier already exists.");
             }
 
             Device newDevice = new Device
             {
-                DeviceUniqueIdentifier = registerDeviceDTO.DeviceIdentifier,
-                Name = registerDeviceDTO.Name,
-                Location = registerDeviceDTO.Location,
+                DeviceUniqueIdentifier = addDeviceDTO.DeviceUniqueIdentifier,
+                Name = addDeviceDTO.Name,
                 RegistrationDate = DateTime.UtcNow,
             };
 
@@ -99,7 +96,7 @@ namespace AgroMonitor.Controllers
         }
 
         [HttpDelete("{id}")]
-        public async Task<ActionResult> UnregisterDevice(int id)
+        public async Task<ActionResult> RemoveDevice(int id)
         {
             var device = await _db.Devices
                 .Include(d => d.Readings)
@@ -116,7 +113,7 @@ namespace AgroMonitor.Controllers
 
             await _db.SaveChangesAsync();
 
-            return Ok(new { message = "Device unregistered successfully", id = device.Id });
+            return Ok(new { message = "Device removed successfully", id = device.Id });
         }
 
 
