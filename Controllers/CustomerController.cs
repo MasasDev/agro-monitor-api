@@ -41,7 +41,7 @@ namespace AgroMonitor.Controllers
         }
 
         [HttpPost]
-        public async Task<ActionResult<AddCustomerDTO>> AddCustomer([FromBody] AddCustomerDTO addCustomerDTO)
+        public async Task<ActionResult<CustomerDTO>> AddCustomer([FromBody] AddCustomerDTO addCustomerDTO)
         {
             if (addCustomerDTO == null)
             {
@@ -135,6 +135,7 @@ namespace AgroMonitor.Controllers
         {
             return new CustomerDTO
             {
+                Id = customer.Id,
                 CustomerUniqueIdentifier = customer.CustomerUniqueIdentifier,
                 Name = customer.Name,
                 PhoneNumber = customer.PhoneNumber,
