@@ -20,11 +20,11 @@ namespace AgroMonitor.Controllers
         [HttpGet("{id}")]
         public async Task<ActionResult<CustomerDTO>> GetCustomer(int id)
         {
-            var customer = await _db.Customers.Include(c => c.RentedDevices).FirstOrDefaultAsync(c => c.Id == id);
+            var customer = await _db.Customers.Include(c => c.CustomerPackages).ThenInclude(cp => cp.Package).FirstOrDefaultAsync(c => c.Id == id);
 
             if(customer == null)
             {
-                return NotFound("This customer does not exist in the system");
+                return NotFound("Customer not found");
             }
 
             CustomerDTO customerDTO = ToCustomerDTO(customer);
@@ -35,7 +35,7 @@ namespace AgroMonitor.Controllers
         [HttpGet]
         public async Task<ActionResult<List<CustomerDTO>>> GetCustomers()
         {
-            List<CustomerDTO> customers = await _db.Customers.Include(c => c.RentedDevices).Select(c => ToCustomerDTO(c)).ToListAsync();
+            List<CustomerDTO> customers = await _db.Customers.Include(c => c.CustomerPackages).ThenInclude(cp => cp.Package).Select(c => ToCustomerDTO(c)).ToListAsync();
 
             return Ok(customers);
         }
@@ -45,7 +45,7 @@ namespace AgroMonitor.Controllers
         {
             if (addCustomerDTO == null)
             {
-                return BadRequest("There is no customer to add");
+                return BadRequest("Add payload is missing");
             }
 
             if (string.IsNullOrEmpty(addCustomerDTO.Name) || string.IsNullOrEmpty(addCustomerDTO.PhoneNumber))
@@ -101,7 +101,7 @@ namespace AgroMonitor.Controllers
 
             if(customer == null)
             {
-                return BadRequest("This customer does not exist in the system");
+                return BadRequest("Customer not found");
             }
 
             customer.Name = updateCustomerDTO.Name;
@@ -122,7 +122,7 @@ namespace AgroMonitor.Controllers
 
             if(customer == null)
             {
-                return NotFound("This customer does not exist in the system");
+                return NotFound("Customer not found");
             }
 
              _db.Customers.Remove(customer);
@@ -140,23 +140,20 @@ namespace AgroMonitor.Controllers
                 Name = customer.Name,
                 PhoneNumber = customer.PhoneNumber,
                 Email = customer.Email,
-                RentedDevices = customer.RentedDevices.Select(d => new DeviceDTO
-                {
-                    Name = d.Name,
-                    DeviceUniqueIdentifier = d.DeviceUniqueIdentifier,
-                    RegistrationDate = d.RegistrationDate,
-                    Readings = d.Readings.Select(r => new SensorReadingDTO
-                    {
-                        SensorType = r.SensorType,
-                        SensorValue = r.SensorValue,
-                        Timestamp = r.TimeStamp,
-                        DeviceName = d.Name
-                    }).ToList(),
-                }).ToList(),
                 RentedDevicesReturnDate = customer.RentedDevicesReturnDate,
                 FarmLocation = customer.FarmLocation,
                 AreRentedDevicesReturned = customer.AreRentedDevicesReturned,
                 RegistrationDate = customer.RegistrationDate,
+                Packages = customer.CustomerPackages.Select(cp => new PackageDTO
+                {
+                    Id = cp.Package.Id,
+                    Name = cp.Package.Name,
+                    Price = cp.Package.Price,
+                    Description = cp.Package.Description,
+                    CreatedAt = cp.Package.CreatedAt,
+                    LastUpdatedAt = cp.Package.LastUpdatedAt,
+                    DeviceId = cp.Package.DeviceId,
+                }).ToList(),
             };
         }
 

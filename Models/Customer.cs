@@ -19,6 +19,6 @@ namespace AgroMonitor.Models
         public bool AreRentedDevicesReturned { get; set; }
         public DateTime RegistrationDate { get; set; }
         public DateTime? RentedDevicesReturnDate { get; set; }
-        public List<Device> RentedDevices { get; set; } = new List<Device>();
+        public ICollection<CustomerPackage> CustomerPackages { get; set; } = new List<CustomerPackage>();
     }
 }

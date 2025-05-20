@@ -3,6 +3,7 @@ using System;
 using AgroMonitor.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace AgroMonitor.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250520104047_CreatePackageEntityWithDeviceForeignKey")]
+    partial class CreatePackageEntityWithDeviceForeignKey
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -66,34 +69,6 @@ namespace AgroMonitor.Migrations
                     b.ToTable("Customers");
                 });
 
-            modelBuilder.Entity("AgroMonitor.Models.CustomerPackage", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("integer");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
-
-                    b.Property<DateTime>("AssignedAt")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<int>("CustomerId")
-                        .HasColumnType("integer");
-
-                    b.Property<int>("PackageId")
-                        .HasColumnType("integer");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("CustomerId");
-
-                    b.HasIndex("Id");
-
-                    b.HasIndex("PackageId");
-
-                    b.ToTable("CustomerPackages");
-                });
-
             modelBuilder.Entity("AgroMonitor.Models.Device", b =>
                 {
                     b.Property<int>("Id")
@@ -101,6 +76,9 @@ namespace AgroMonitor.Migrations
                         .HasColumnType("integer");
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<int?>("CustomerId")
+                        .HasColumnType("integer");
 
                     b.Property<string>("DeviceUniqueIdentifier")
                         .IsRequired()
@@ -114,6 +92,8 @@ namespace AgroMonitor.Migrations
                         .HasColumnType("timestamp with time zone");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("CustomerId");
 
                     b.ToTable("Devices");
                 });
@@ -181,23 +161,11 @@ namespace AgroMonitor.Migrations
                     b.ToTable("SensorReadings");
                 });
 
-            modelBuilder.Entity("AgroMonitor.Models.CustomerPackage", b =>
+            modelBuilder.Entity("AgroMonitor.Models.Device", b =>
                 {
-                    b.HasOne("AgroMonitor.Models.Customer", "Customer")
-                        .WithMany("CustomerPackages")
-                        .HasForeignKey("CustomerId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("AgroMonitor.Models.Package", "Package")
-                        .WithMany("CustomerPackages")
-                        .HasForeignKey("PackageId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Customer");
-
-                    b.Navigation("Package");
+                    b.HasOne("AgroMonitor.Models.Customer", null)
+                        .WithMany("RentedDevices")
+                        .HasForeignKey("CustomerId");
                 });
 
             modelBuilder.Entity("AgroMonitor.Models.Package", b =>
@@ -224,17 +192,12 @@ namespace AgroMonitor.Migrations
 
             modelBuilder.Entity("AgroMonitor.Models.Customer", b =>
                 {
-                    b.Navigation("CustomerPackages");
+                    b.Navigation("RentedDevices");
                 });
 
             modelBuilder.Entity("AgroMonitor.Models.Device", b =>
                 {
                     b.Navigation("Readings");
-                });
-
-            modelBuilder.Entity("AgroMonitor.Models.Package", b =>
-                {
-                    b.Navigation("CustomerPackages");
                 });
 #pragma warning restore 612, 618
         }

@@ -11,6 +11,6 @@
         public bool AreRentedDevicesReturned { get; set; }
         public DateTime RegistrationDate { get; set; }
         public DateTime? RentedDevicesReturnDate { get; set; }
-        public List<DeviceDTO> RentedDevices { get; set; } = new List<DeviceDTO>();
+        public List<PackageDTO> Packages { get; set; } = new();
     }
 }
