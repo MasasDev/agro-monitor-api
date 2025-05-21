@@ -227,3 +227,13 @@ GET {{AgroMonitor_HostAddress}}/api/sensorreadings
 GET {{AgroMonitor_HostAddress}}/api/sensorreadings/{{id}}
 
 ###
+
+POST {{AgroMonitor_HostAddress}}/api/customerpackage
+Content-Type: application/json
+
+{
+  "packageId": 1,
+  "customerId": 1
+}
+
+###
