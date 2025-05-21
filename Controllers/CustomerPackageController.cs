@@ -47,6 +47,7 @@ namespace AgroMonitor.Controllers
             {
                 PackageId = assignPackageToCustomer.PackageId,
                 CustomerId = assignPackageToCustomer.CustomerId,
+                AssignedAt = DateTime.UtcNow,
             };
 
             await _db.CustomerPackages.AddAsync(customerPackage);
