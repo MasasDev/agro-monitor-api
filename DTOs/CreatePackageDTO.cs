@@ -17,7 +17,5 @@ namespace AgroMonitor.DTOs
         [Required]
         [Range(1, long.MaxValue)]
         public int DeviceId { get; set; }
-
-        public DateTime CreatedAt { get; set; }
     }
 }

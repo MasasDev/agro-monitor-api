@@ -23,23 +23,10 @@ namespace AgroMonitor.Controllers
 
             if (device == null)
             {
-                return NotFound();
+                return NotFound("Device not found");
             }
 
-            DeviceDTO deviceDTO = new DeviceDTO
-            {
-                DeviceUniqueIdentifier = device.DeviceUniqueIdentifier,
-                Name = device.Name,
-                RegistrationDate = device.RegistrationDate,
-                Readings = device.Readings.Select(r => new SensorReadingDTO
-                {
-                    SensorType = r.SensorType,
-                    SensorValue = r.SensorValue,
-                    Timestamp = r.TimeStamp,
-                    DeviceName = device.Name
-
-                }).ToList()
-            };
+            DeviceDTO deviceDTO = ToDeviceDTO(device);
 
             return Ok(deviceDTO);
         }
@@ -47,21 +34,7 @@ namespace AgroMonitor.Controllers
         [HttpGet]
         public async Task<ActionResult<List<DeviceDTO>>> GetAllDevices()
         {
-            var devices = await _db.Devices.Include(_ => _.Readings).Select(d => new DeviceDTO
-            {
-                DeviceUniqueIdentifier = d.DeviceUniqueIdentifier,
-                Name = d.Name,
-                RegistrationDate = d.RegistrationDate,
-                Readings = d.Readings.Select(r => new SensorReadingDTO
-                {
-                    SensorType = r.SensorType,
-                    SensorValue = r.SensorValue,
-                    Timestamp = r.TimeStamp,
-                    DeviceName = d.Name,
-
-                }).ToList()
-
-            }).ToListAsync();
+            var devices = await _db.Devices.Include(_ => _.Readings).Select(d => ToDeviceDTO(d)).ToListAsync();
 
             return Ok(devices);
         }
@@ -104,7 +77,7 @@ namespace AgroMonitor.Controllers
 
             if (device == null)
             {
-                return NotFound("This device does not exist in the system");
+                return NotFound("Device not found");
             }
 
             _db.SensorReadings.RemoveRange(device.Readings);
@@ -114,6 +87,25 @@ namespace AgroMonitor.Controllers
             await _db.SaveChangesAsync();
 
             return Ok(new { message = "Device removed successfully", id = device.Id });
+        }
+
+        private static DeviceDTO ToDeviceDTO(Device device)
+        {
+            return new DeviceDTO
+            {
+                Id = device.Id,
+                DeviceUniqueIdentifier = device.DeviceUniqueIdentifier,
+                Name = device.Name,
+                RegistrationDate = device.RegistrationDate,
+                Readings = device.Readings.Select(r => new SensorReadingDTO
+                {
+                    SensorType = r.SensorType,
+                    SensorValue = r.SensorValue,
+                    Timestamp = r.TimeStamp,
+                    DeviceName = device.Name,
+
+                }).ToList()
+            };
         }
 
 
