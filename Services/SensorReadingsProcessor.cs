@@ -4,6 +4,7 @@ using AgroMonitor.DTOs;
 using AgroMonitor.Models;
 using AgroMonitor.Services.Interfaces;
 using Microsoft.EntityFrameworkCore;
+using Twilio.Types;
 
 namespace AgroMonitor.Shared
 {
@@ -68,16 +69,10 @@ namespace AgroMonitor.Shared
                     .ThenInclude(cp => cp.Customer)
                     .FirstOrDefault(p => p.DeviceId == sensorReadingBatch.DeviceId);
 
-            foreach(var customerPackage in package!.CustomerPackages)
-            {
-                var phoneNumber = customerPackage.Customer.PhoneNumber;
+            var customer = package.CustomerPackages.Select(cp => cp.Customer).First();
 
-                if(phoneNumber.StartsWith("+256"))
-                {
-                    _twilioService.SendSMS(ToNaturalLanguage(sensorReadings), phoneNumber);
-                    _twilioService.SendSMS(aiResponse, phoneNumber);
-                }
-            }
+            _twilioService.SendSMS(ToNaturalLanguage(sensorReadings), customer.PhoneNumber);
+            _twilioService.SendSMS(aiResponse, customer.PhoneNumber);
         }
     }
 }

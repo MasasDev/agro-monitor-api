@@ -242,7 +242,7 @@ POST {{AgroMonitor_HostAddress}}/api/sensorreadings
 Content-Type: application/json
 
 {
-  "DeviceIdentifier": "0900",
+  "DeviceIdentifier": "CU32949",
   "Readings": [
     {
       "SensorType": "Temperature",
@@ -257,6 +257,15 @@ Content-Type: application/json
       "Value": 90
     }
   ]
+}
+
+###
+
+POST {{AgroMonitor_HostAddress}}/api/sensorreadings
+Content-Type: application/json
+
+{
+  //SensorDataPayload
 }
 
 ###
