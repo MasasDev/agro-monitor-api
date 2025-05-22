@@ -7,6 +7,7 @@
         public double SensorValue { get; set; }
         public DateTime Timestamp { get; set; }
         public string DeviceName { get; set; } = null!;
+        public SensorReadingBatchDTO? Batch { get; set; }
 
     }
 }

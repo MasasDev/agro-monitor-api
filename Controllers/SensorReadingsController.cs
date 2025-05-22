@@ -23,23 +23,17 @@ namespace AgroMonitor.Controllers
         [HttpGet("{id}")]
         public async Task<ActionResult<SensorReading>> GetReading(int id)
         {
-           var reading = await _db.SensorReadings.Include(reading => reading.Device).FirstOrDefaultAsync(reading => reading.Id == id);
+           var reading = await _db.SensorReadings
+                .Include(reading => reading.Device)
+                .Include(reading => reading.Batch)
+                .FirstOrDefaultAsync(reading => reading.Id == id);
 
             if(reading == null)
             {
                 return NotFound();
             }
 
-            SensorReadingDTO sensorReadingDTO = new SensorReadingDTO
-            {
-                Id = id,
-                SensorType = reading.SensorType,
-                SensorValue = reading.SensorValue,
-                Timestamp = reading.TimeStamp,
-                DeviceName = reading.Device.Name,
-            };
-
-            return Ok(sensorReadingDTO);
+            return Ok(ToDTO(reading));
         }
    
         [HttpGet]
@@ -50,16 +44,10 @@ namespace AgroMonitor.Controllers
                 return NotFound("There are no readings yet. Try later");
             }
 
-            var readings = await _db.SensorReadings.Include(reading => reading.Device).Select(reading =>
-                new SensorReadingDTO
-                {
-                    Id = reading.Id,
-                    SensorType = reading.SensorType,
-                    SensorValue = reading.SensorValue,
-                    Timestamp = reading.TimeStamp,
-                    DeviceName = reading.Device.Name,
-                }
-            ).ToListAsync();
+            var readings = await _db.SensorReadings
+                .Include(reading => reading.Device)
+                .Include(reading => reading.Batch)
+                .Select(reading => ToDTO(reading)).ToListAsync();
 
             return Ok(readings);
         }
@@ -100,7 +88,27 @@ namespace AgroMonitor.Controllers
                 InsertedCount = readings.Count,
                 Timestamp = DateTime.UtcNow
             });
-        }       
+        }
+        private static SensorReadingDTO ToDTO(SensorReading sensorReading)
+        {
+            return new SensorReadingDTO
+            {
+                SensorType = sensorReading.SensorType,
+                SensorValue = sensorReading.SensorValue,
+                Timestamp = sensorReading.TimeStamp,
+                DeviceName = sensorReading.Device.Name,
+                Batch = sensorReading.Batch != null ? new SensorReadingBatchDTO
+                {
+                    Id = sensorReading.Batch.Id,
+                    SensorReadings = sensorReading.Batch.SensorReadings,
+                    AISuggestion = sensorReading.Batch.AISuggestion,
+                    Device = sensorReading.Device,
+                    CreatedAt = sensorReading.Batch.CreatedAt,
+
+                } : null
+
+            };
+        }
         
     }
 }
