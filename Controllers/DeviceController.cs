@@ -92,20 +92,6 @@ namespace AgroMonitor.Controllers
                 return BadRequest("One or more devices have missing brand codes.");
             }
 
-            addDeviceDTOList.ForEach(d => d.BrandCode = d.BrandCode.ToUpper());
-
-            var incomingBrandCodes = addDeviceDTOList.Select(d => d.BrandCode).ToList();
-
-            var existingBrandCodes = await _db.Devices
-                .Where(d => incomingBrandCodes.Contains(d.BrandCode))
-                .Select(d => d.BrandCode)
-                .ToListAsync();
-
-            if (existingBrandCodes.Any())
-            {
-                return Conflict($"Devices with the following brand codes already exist: {string.Join(", ", existingBrandCodes)}");
-            }
-
             var random = new Random();
 
             var existingIdentifiers = new HashSet<string>(
