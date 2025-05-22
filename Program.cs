@@ -6,6 +6,7 @@ using AgroMonitor.Services.Interfaces;
 using AgroMonitor.Shared;
 using AgroMonitor.Services;
 using AgroMonitor.DTOs;
+using AgroMonitor.Controllers;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -35,6 +36,10 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
 {
     options.UseNpgsql(connectionString);
 });
+
+builder.Services.AddEndpointsApiExplorer();
+
+builder.Services.AddSwaggerGen();
 
 
 var app = builder.Build();

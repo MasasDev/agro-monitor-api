@@ -67,6 +67,7 @@ namespace AgroMonitor.Controllers
             };
 
             await _db.Packages.AddAsync(package);
+
             await _db.SaveChangesAsync();
 
             return CreatedAtAction(nameof(GetPackage), new { id = package.Id }, ToPackageDTO(package));

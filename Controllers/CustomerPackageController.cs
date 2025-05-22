@@ -53,7 +53,7 @@ namespace AgroMonitor.Controllers
             await _db.CustomerPackages.AddAsync(customerPackage);
             await _db.SaveChangesAsync();
 
-            return CreatedAtAction(nameof(AssignPackageToCustomer), new { customerId = customerPackage.CustomerId, packageId = customerPackage.PackageId },
+             return CreatedAtAction(nameof(AssignPackageToCustomer), new { customerId = customerPackage.CustomerId, packageId = customerPackage.PackageId },
                 new AssignedPackageResponseDTO
                 {
                     CustomerId = customer.Id,

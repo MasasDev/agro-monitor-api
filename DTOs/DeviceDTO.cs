@@ -1,6 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore.Metadata.Conventions;
-
-namespace AgroMonitor.DTOs
+﻿namespace AgroMonitor.DTOs
 {
     public class DeviceDTO
     {
