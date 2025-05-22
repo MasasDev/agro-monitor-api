@@ -198,7 +198,7 @@ namespace AgroMonitor.Controllers
                     SensorValue = r.SensorValue,
                     Timestamp = r.TimeStamp,
                     DeviceName = device.Name,
-                    Batch = new SensorReadingBatchDTO
+                    Batch = r.Batch != null ? new SensorReadingBatchDTO
                     {
                         Id = r.Batch.Id,
                         Readings = r.Batch.SensorReadings.Select(r => new SensorReadingDTO
@@ -211,12 +211,12 @@ namespace AgroMonitor.Controllers
                         AISuggestion = r.Batch.AISuggestion,
                         Device = new DeviceDTO
                         {
-                           Name = r.Batch.Device.Name,
-                           BrandCode = r.Batch.Device.BrandCode,
-                           DeviceUniqueIdentifier = r.Batch.Device.DeviceUniqueIdentifier,
+                            Name = r.Batch.Device.Name,
+                            BrandCode = r.Batch.Device.BrandCode,
+                            DeviceUniqueIdentifier = r.Batch.Device.DeviceUniqueIdentifier,
                         },
                         CreatedAt = r.Batch.CreatedAt,
-                    }
+                    } : null
 
                 }).ToList()
             };

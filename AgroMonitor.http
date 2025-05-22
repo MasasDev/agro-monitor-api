@@ -431,6 +431,6 @@ GET {{AgroMonitor_HostAddress}}/api/device
 
 ###
 
-GET {{AgroMonitor_HostAddress}}/api/device/1
+GET {{AgroMonitor_HostAddress}}/api/device/5
 
 ###
