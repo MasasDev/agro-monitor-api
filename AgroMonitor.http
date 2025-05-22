@@ -394,3 +394,27 @@ Content-Type: application/json
 
 
 ###
+
+POST {{AgroMonitor_HostAddress}}/api/sensorreadings
+Content-Type: application/json
+
+{
+  "DeviceIdentifier": "CU87421",
+  "Readings": [
+    {
+      "SensorType": "Temperature",
+      "Value": 23.5
+    },
+    {
+      "SensorType": "Humidity",
+      "Value": 60.2
+    },
+    {
+      "SensorType": "Moisture",
+      "Value": 45.7
+    }
+  ]
+}
+
+
+###
