@@ -56,7 +56,7 @@ namespace AgroMonitor.Controllers
                 return BadRequest(ModelState);
             }
 
-            if (await _db.PackagesForDisplay.AnyAsync(p => p.Id != id && p.Name.ToUpperInvariant() == updatePackageForDisplay.Name.ToUpperInvariant()))
+            if (await _db.PackagesForDisplay.AnyAsync(p => p.Id != id && p.Name.ToUpper() == updatePackageForDisplay.Name.ToUpper()))
             {
                 return BadRequest("A package for display with this exact name already exists");
             }
@@ -99,7 +99,7 @@ namespace AgroMonitor.Controllers
             {
                 return BadRequest(ModelState);
             }
-            if (await _db.PackagesForDisplay.AnyAsync(p => p.Name.ToUpperInvariant() == createPackageForDisplay.Name.ToUpperInvariant()))
+            if (await _db.PackagesForDisplay.AnyAsync(p => p.Name.ToUpper() == createPackageForDisplay.Name.ToUpper()))
             {
                 return BadRequest("A package for display with this exact name already exists");
             }

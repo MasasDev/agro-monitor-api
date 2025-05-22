@@ -63,7 +63,7 @@ namespace AgroMonitor.Controllers
                 return NotFound("Device for display not found");
             }
 
-            if (await _db.DevicesForDisplay.AnyAsync(d => d.Id != id && d.BrandCode.ToUpperInvariant() == updateDeviceForDisplay.BrandCode.ToUpperInvariant()))
+            if (await _db.DevicesForDisplay.AnyAsync(d => d.Id != id && d.BrandCode.ToUpper() == updateDeviceForDisplay.BrandCode.ToUpper()))
             {
                 return BadRequest("Another device already uses this BrandCode.");
             }
@@ -89,7 +89,7 @@ namespace AgroMonitor.Controllers
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            if(await _db.DevicesForDisplay.AnyAsync(d => d.BrandCode.ToUpperInvariant() == addDeviceForDisplay.BrandCode.ToUpperInvariant()))
+            if(await _db.DevicesForDisplay.AnyAsync(d => d.BrandCode.ToUpper() == addDeviceForDisplay.BrandCode.ToUpper()))
             {
                 return BadRequest("Another device already uses this BrandCode.");
             }
@@ -97,7 +97,7 @@ namespace AgroMonitor.Controllers
             DeviceForDisplay deviceForDisplay = new DeviceForDisplay
             {
                 Name = addDeviceForDisplay.Name,
-                BrandCode = addDeviceForDisplay.BrandCode.ToUpperInvariant(),
+                BrandCode = addDeviceForDisplay.BrandCode.ToUpper(),
                 CreatedAt = DateTime.UtcNow,
             };
 
