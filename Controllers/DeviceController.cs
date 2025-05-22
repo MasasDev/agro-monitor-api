@@ -19,7 +19,11 @@ namespace AgroMonitor.Controllers
         [HttpGet("{id}")]
         public async Task<ActionResult<DeviceDTO>> GetDevice(int id)
         {
-            var device = await _db.Devices.Include(d => d.Readings).FirstOrDefaultAsync(d => d.Id == id);
+            var device = await _db.Devices
+                .Include(d => d.Readings)
+                .ThenInclude(r => r.Batch)
+                .ThenInclude(b => b.SensorReadings)
+                .FirstOrDefaultAsync(d => d.Id == id);
 
             if (device == null)
             {
@@ -194,6 +198,25 @@ namespace AgroMonitor.Controllers
                     SensorValue = r.SensorValue,
                     Timestamp = r.TimeStamp,
                     DeviceName = device.Name,
+                    Batch = new SensorReadingBatchDTO
+                    {
+                        Id = r.Batch.Id,
+                        Readings = r.Batch.SensorReadings.Select(r => new SensorReadingDTO
+                        {
+                            SensorType = r.SensorType,
+                            SensorValue = r.SensorValue,
+                            Timestamp = r.TimeStamp,
+                            DeviceName = r.Device.Name,
+                        }).ToList(),
+                        AISuggestion = r.Batch.AISuggestion,
+                        Device = new DeviceDTO
+                        {
+                           Name = r.Batch.Device.Name,
+                           BrandCode = r.Batch.Device.BrandCode,
+                           DeviceUniqueIdentifier = r.Batch.Device.DeviceUniqueIdentifier,
+                        },
+                        CreatedAt = r.Batch.CreatedAt,
+                    }
 
                 }).ToList()
             };
