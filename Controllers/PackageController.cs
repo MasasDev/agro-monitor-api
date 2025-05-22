@@ -39,7 +39,7 @@ namespace AgroMonitor.Controllers
             return Ok(packages);
         }
 
-        [HttpPost]
+        [HttpPost("single")]
         public async Task<ActionResult<PackageDTO>> CreatePackage([FromBody]CreatePackageDTO createPackage)
         {
             if(createPackage == null)
@@ -73,7 +73,7 @@ namespace AgroMonitor.Controllers
             return CreatedAtAction(nameof(GetPackage), new { id = package.Id }, ToPackageDTO(package));
 
         }
-        [HttpPost]
+        [HttpPost("bulk")]
         public async Task<ActionResult<List<PackageDTO>>> CreatePackages([FromBody] List<CreatePackageDTO> createPackageList)
         {
             if (createPackageList == null || createPackageList.Count == 0)
@@ -117,7 +117,7 @@ namespace AgroMonitor.Controllers
 
 
         [HttpPut("{id}")]
-        public async Task<ActionResult> UpdatePackage(long id,  [FromBody]UpdatePackageDTO updatePackage)
+        public async Task<ActionResult> UpdatePackage(long id, [FromBody]UpdatePackageDTO updatePackage)
         {
             if(updatePackage == null)
             {

@@ -39,7 +39,7 @@ namespace AgroMonitor.Controllers
             return Ok(devices);
         }
 
-        [HttpPost]
+        [HttpPost("single")]
         public async Task<ActionResult<string>> AddDevice([FromBody] AddDeviceDTO addDeviceDTO)
         {
             if (addDeviceDTO == null)
@@ -75,7 +75,7 @@ namespace AgroMonitor.Controllers
 
             return CreatedAtAction(nameof(GetDevice), new { id = newDevice.Id }, newDevice.BrandCode);
         }
-        [HttpPost]
+        [HttpPost("bulk")]
         public async Task<ActionResult<List<DeviceDTO>>> AddDevices([FromBody] List<AddDeviceDTO> addDeviceDTOList)
         {
             if (addDeviceDTOList == null || addDeviceDTOList.Count == 0)

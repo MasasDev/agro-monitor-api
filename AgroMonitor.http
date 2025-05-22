@@ -297,3 +297,100 @@ Content-Type: application/json
 }
 
 ###
+
+POST {{AgroMonitor_HostAddress}}/api/device
+Content-Type: application/json
+
+{
+  [
+  {
+    "BrandCode": "ABC123",
+    "Name": "Soil Sensor",
+    "DeviceIdentifier": "CU12345"
+  },
+  {
+    "BrandCode": "DEF456",
+    "Name": "Weather Station",
+    "DeviceIdentifier": "CU67890"
+  },
+  {
+    "BrandCode": "GHI789",
+    "Name": "Irrigation Controller",
+    "DeviceIdentifier": "CU54321"
+  }
+]
+
+}
+
+###
+
+POST {{AgroMonitor_HostAddress}}/api/device/bulk
+Content-Type: application/json
+
+[
+  {
+    "BrandCode": "ABC123",
+    "Name": "Soil Sensor",
+    "DeviceIdentifier": "CU12345"
+  },
+  {
+    "BrandCode": "DEF456",
+    "Name": "Weather Station",
+    "DeviceIdentifier": "CU67890"
+  },
+  {
+    "BrandCode": "GHI789",
+    "Name": "Irrigation Controller",
+    "DeviceIdentifier": "CU54321"
+  }
+]
+
+###
+
+POST {{AgroMonitor_HostAddress}}/api/package/bulk
+Content-Type: application/json
+
+[
+  {
+    "Name": "Basic Monitoring",
+    "Description": "Includes soil moisture and temperature sensors",
+    "Price": 49.99,
+    "DeviceId": 7
+  },
+  {
+    "Name": "Advanced Analytics",
+    "Description": "Includes weather station, data logging, and cloud sync",
+    "Price": 129.99,
+    "DeviceId": 8
+  },
+  {
+    "Name": "Full Automation",
+    "Description": "Complete system with irrigation controller and AI recommendations",
+    "Price": 299.99,
+    "DeviceId": 9
+  }
+]
+
+
+###
+
+POST {{AgroMonitor_HostAddress}}/api/customerpackage/bulk
+Content-Type: application/json
+
+[
+  {
+    "PackageId": 6,
+    "CustomerId": 13
+  },
+  {
+    "PackageId": 7,
+    "CustomerId": 13
+  },
+  {
+    "PackageId": 8,
+    "CustomerId": 13
+  }
+]
+
+
+###

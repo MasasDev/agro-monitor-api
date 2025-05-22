@@ -17,7 +17,7 @@ namespace AgroMonitor.Controllers
             _db = db;
         }
 
-        [HttpPost]
+        [HttpPost("single")]
         public async Task<ActionResult> AssignPackageToCustomer([FromBody]AssignPackageToCustomerDTO assignPackageToCustomer)
         {
             if(assignPackageToCustomer == null)
@@ -64,7 +64,7 @@ namespace AgroMonitor.Controllers
                     AssignedAt = customerPackage.AssignedAt
                 });
         }
-        [HttpPost]
+        [HttpPost("bulk")]
         public async Task<ActionResult<List<AssignedPackageResponseDTO>>> AssignPackagesToCustomer([FromBody] List<AssignPackageToCustomerDTO> assignPackageToCustomerDTOList)
         {
             if (assignPackageToCustomerDTOList == null || assignPackageToCustomerDTOList.Count == 0)
