@@ -46,18 +46,18 @@ namespace AgroMonitor.Controllers
             {
                 return BadRequest("The payload is missing");
             }
-            if (string.IsNullOrWhiteSpace(addDeviceDTO.DeviceUniqueIdentifier))
+            if (string.IsNullOrWhiteSpace(addDeviceDTO.BrandCode))
             {
-                return BadRequest("The device must have a unique identifier.");
+                return BadRequest("The brand code is missing");
             }
-            if (await _db.Devices.AnyAsync(d => d.DeviceUniqueIdentifier == addDeviceDTO.DeviceUniqueIdentifier))
+            if (await _db.Devices.AnyAsync(d => d.BrandCode == addDeviceDTO.BrandCode))
             {
-                return Conflict("A device with this identifier already exists.");
+                return Conflict("A device with this brand code already exists");
             }
 
             Device newDevice = new Device
             {
-                DeviceUniqueIdentifier = addDeviceDTO.DeviceUniqueIdentifier,
+                BrandCode = addDeviceDTO.BrandCode,
                 Name = addDeviceDTO.Name,
                 RegistrationDate = DateTime.UtcNow,
             };
@@ -65,7 +65,7 @@ namespace AgroMonitor.Controllers
             await _db.Devices.AddAsync(newDevice);
             await _db.SaveChangesAsync();
 
-            return CreatedAtAction(nameof(GetDevice), new { id = newDevice.Id }, newDevice.DeviceUniqueIdentifier);
+            return CreatedAtAction(nameof(GetDevice), new { id = newDevice.Id }, newDevice.BrandCode);
         }
 
         [HttpDelete("{id}")]
@@ -94,7 +94,8 @@ namespace AgroMonitor.Controllers
             return new DeviceDTO
             {
                 Id = device.Id,
-                DeviceUniqueIdentifier = device.DeviceUniqueIdentifier,
+                BrandCode = device.BrandCode,
+                DeviceUniqueIdentifier = device.DeviceUniqueIdentifier?? string.Empty,
                 Name = device.Name,
                 RegistrationDate = device.RegistrationDate,
                 Readings = device.Readings.Select(r => new SensorReadingDTO

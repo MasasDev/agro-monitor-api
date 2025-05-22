@@ -1,6 +1,8 @@
 ﻿using AgroMonitor.Data;
 using AgroMonitor.DTOs;
+using AgroMonitor.Migrations;
 using AgroMonitor.Models;
+using AgroMonitor.Services.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -11,9 +13,11 @@ namespace AgroMonitor.Controllers
     public class SensorReadingsController : ControllerBase
     {
         private readonly ApplicationDbContext _db;
-        public SensorReadingsController(ApplicationDbContext db) 
+        private readonly ISensorReadingsProcessor _sensorReadingsProcessor;
+        public SensorReadingsController(ApplicationDbContext db, ISensorReadingsProcessor sensorReadingsProcessor) 
         {
             _db = db;
+            _sensorReadingsProcessor = sensorReadingsProcessor;
         }
 
         [HttpGet("{id}")]
@@ -72,7 +76,7 @@ namespace AgroMonitor.Controllers
 
             if (device == null)
             {
-                return NotFound("This device is not registered");
+                return NotFound("Device not found");
             }
 
             var readings = payload.Readings.Select(reading => 
@@ -88,14 +92,15 @@ namespace AgroMonitor.Controllers
             _db.SensorReadings.AddRange(readings);
             await _db.SaveChangesAsync();
 
+            await _sensorReadingsProcessor.ProcessAsync(readings);
+
             return Ok(new
             {
                 Device = device.Name,
                 InsertedCount = readings.Count,
                 Timestamp = DateTime.UtcNow
             });
-        }
-       
+        }       
         
     }
 }

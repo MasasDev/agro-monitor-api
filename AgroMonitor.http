@@ -237,3 +237,44 @@ Content-Type: application/json
 }
 
 ###
+
+POST {{AgroMonitor_HostAddress}}/api/sensorreadings
+Content-Type: application/json
+
+{
+  "DeviceIdentifier": "0900",
+  "Readings": [
+    {
+      "SensorType": "Temperature",
+      "Value": 7
+    },
+    {
+      "SensorType": "Humidity",
+      "Value": 5
+    },
+    {
+      "SensorType": "Moisture",
+      "Value": 90
+    }
+  ]
+}
+
+###
+
+POST {{AgroMonitor_HostAddress}}/api/sensorreadings
+Content-Type: application/json
+
+{
+  //SensorDataPayload
+}
+
+###
+
+POST {{AgroMonitor_HostAddress}}/api/sensorreadings
+Content-Type: application/json
+
+{
+  //SensorDataPayload
+}
+
+###

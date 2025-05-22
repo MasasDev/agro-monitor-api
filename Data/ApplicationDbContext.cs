@@ -14,6 +14,7 @@ namespace AgroMonitor.Data
         public DbSet<Customer> Customers { get; set; }
         public DbSet<Package> Packages { get; set; }
         public DbSet<CustomerPackage> CustomerPackages { get; set; }
+        public DbSet<SensorReadingBatch> ReadingBatches { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

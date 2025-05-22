@@ -13,9 +13,13 @@ namespace AgroMonitor.Models
         [Required]
         public double SensorValue { get; set; }
         public DateTime TimeStamp { get; set; }
-        public Device Device { get; set; } = null!;
 
         [ForeignKey("Device")]
         public int DeviceId { get; set; }
+        public Device Device { get; set; } = null!;
+
+        [ForeignKey(nameof(Batch))]
+        public int? BatchId { get; set; }
+        public SensorReadingBatch? Batch { get; set; }
     }
 }

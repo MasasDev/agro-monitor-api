@@ -8,7 +8,8 @@ namespace AgroMonitor.Models
         [Key]
         public int Id { get; set; }
         [Required]
-        public string DeviceUniqueIdentifier { get; set; } = null!;
+        public string BrandCode { get; set; } = null!;
+        public string? DeviceUniqueIdentifier { get; set; }
         [Required]
         public string Name { get; set; } = string.Empty;
         public DateTime RegistrationDate { get; set; }

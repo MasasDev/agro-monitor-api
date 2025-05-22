@@ -1,6 +1,11 @@
 using AgroMonitor.Data;
 using Microsoft.EntityFrameworkCore;
 using DotNetEnv;
+using System.Buffers.Text;
+using AgroMonitor.Services.Interfaces;
+using AgroMonitor.Shared;
+using AgroMonitor.Services;
+using AgroMonitor.DTOs;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -13,10 +18,24 @@ builder.Services.AddControllers();
 builder.Services.AddOpenApi();
 string connectionString = Environment.GetEnvironmentVariable("DB_CONNECTION_STRING")!;
 
+string geminiApiKey = Environment.GetEnvironmentVariable("GEMINI_API_KEY")!;
+
+string? geminiBaseUrl = $"{builder.Configuration["ApiSettings:Gemini_API_Url"]}";
+
+builder.Services.AddHttpClient<IGeminiService, GeminiService>(client =>
+{
+    client.BaseAddress = new Uri($"{geminiBaseUrl}?key={geminiApiKey}");
+});
+
+builder.Services.AddScoped<ISensorReadingsProcessor, SensorReadingsProcessor>();
+
+builder.Services.AddScoped<ITwilioService, TwilioService>();
+
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
 {
     options.UseNpgsql(connectionString);
 });
+
 
 var app = builder.Build();
 
