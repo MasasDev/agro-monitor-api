@@ -418,3 +418,7 @@ Content-Type: application/json
 
 
 ###
+
+GET {{AgroMonitor_HostAddress}}/api/sensorreadings
+
+###

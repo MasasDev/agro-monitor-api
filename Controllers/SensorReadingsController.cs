@@ -26,6 +26,8 @@ namespace AgroMonitor.Controllers
            var reading = await _db.SensorReadings
                 .Include(reading => reading.Device)
                 .Include(reading => reading.Batch)
+                .ThenInclude(b => b.SensorReadings)
+                .ThenInclude(b => b.Device)
                 .FirstOrDefaultAsync(reading => reading.Id == id);
 
             if(reading == null)
@@ -47,6 +49,8 @@ namespace AgroMonitor.Controllers
             var readings = await _db.SensorReadings
                 .Include(reading => reading.Device)
                 .Include(reading => reading.Batch)
+                .ThenInclude(b => b.SensorReadings)
+                .ThenInclude(b => b.Device)
                 .Select(reading => ToDTO(reading)).ToListAsync();
 
             return Ok(readings);
@@ -100,13 +104,23 @@ namespace AgroMonitor.Controllers
                 Batch = sensorReading.Batch != null ? new SensorReadingBatchDTO
                 {
                     Id = sensorReading.Batch.Id,
-                    SensorReadings = sensorReading.Batch.SensorReadings,
+                    Readings = sensorReading.Batch.SensorReadings.Select(r => new SensorReadingDTO
+                    {
+                        SensorType = r.SensorType,
+                        SensorValue = r.SensorValue,
+                        Timestamp = r.TimeStamp,
+                        DeviceName = r.Device.Name,
+                    }).ToList(),
                     AISuggestion = sensorReading.Batch.AISuggestion,
-                    Device = sensorReading.Device,
+                    Device = new DeviceDTO
+                    {
+                        Name = sensorReading.Batch.Device.Name,
+                        BrandCode = sensorReading.Batch.Device.BrandCode,
+                        DeviceUniqueIdentifier = sensorReading.Batch.Device.DeviceUniqueIdentifier,
+                    },
                     CreatedAt = sensorReading.Batch.CreatedAt,
 
                 } : null
-
             };
         }
         
