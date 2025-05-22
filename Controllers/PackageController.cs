@@ -73,6 +73,49 @@ namespace AgroMonitor.Controllers
             return CreatedAtAction(nameof(GetPackage), new { id = package.Id }, ToPackageDTO(package));
 
         }
+        [HttpPost]
+        public async Task<ActionResult<List<PackageDTO>>> CreatePackages([FromBody] List<CreatePackageDTO> createPackageList)
+        {
+            if (createPackageList == null || createPackageList.Count == 0)
+            {
+                return BadRequest("Payload is missing or empty.");
+            }
+
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
+            var deviceIds = createPackageList.Select(p => p.DeviceId).Distinct().ToList();
+
+            var devices = await _db.Devices
+                .Where(d => deviceIds.Contains(d.Id))
+                .ToDictionaryAsync(d => d.Id);
+
+            var invalidDeviceIds = deviceIds.Except(devices.Keys).ToList();
+            if (invalidDeviceIds.Any())
+            {
+                return NotFound($"Devices not found for IDs: {string.Join(", ", invalidDeviceIds)}");
+            }
+
+            var packages = createPackageList.Select(p => new Package
+            {
+                Name = p.Name,
+                Description = p.Description,
+                Price = p.Price,
+                DeviceId = p.DeviceId,
+                CreatedAt = DateTime.UtcNow
+            }).ToList();
+
+            await _db.Packages.AddRangeAsync(packages);
+            await _db.SaveChangesAsync();
+
+            var result = packages.Select(ToPackageDTO).ToList();
+
+            return Ok(result);
+        }
+
+
         [HttpPut("{id}")]
         public async Task<ActionResult> UpdatePackage(long id,  [FromBody]UpdatePackageDTO updatePackage)
         {

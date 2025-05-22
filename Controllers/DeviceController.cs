@@ -55,10 +55,18 @@ namespace AgroMonitor.Controllers
                 return Conflict("A device with this brand code already exists");
             }
 
+            Random random = new Random();
+
+            while(await _db.Devices.AnyAsync(d => d.DeviceUniqueIdentifier == addDeviceDTO.DeviceIdentifier))
+            {
+                addDeviceDTO.DeviceIdentifier = "CU" + random.Next(10000, 99999).ToString();
+            }
+
             Device newDevice = new Device
             {
-                BrandCode = addDeviceDTO.BrandCode.ToUpperInvariant(),
+                BrandCode = addDeviceDTO.BrandCode.ToUpper(),
                 Name = addDeviceDTO.Name,
+                DeviceUniqueIdentifier = addDeviceDTO.DeviceIdentifier,
                 RegistrationDate = DateTime.UtcNow,
             };
 
@@ -67,6 +75,69 @@ namespace AgroMonitor.Controllers
 
             return CreatedAtAction(nameof(GetDevice), new { id = newDevice.Id }, newDevice.BrandCode);
         }
+        [HttpPost]
+        public async Task<ActionResult<List<DeviceDTO>>> AddDevices([FromBody] List<AddDeviceDTO> addDeviceDTOList)
+        {
+            if (addDeviceDTOList == null || addDeviceDTOList.Count == 0)
+            {
+                return BadRequest("Payload is missing or empty.");
+            }
+
+            var invalidItems = addDeviceDTOList
+                .Where(d => string.IsNullOrWhiteSpace(d.BrandCode))
+                .ToList();
+
+            if (invalidItems.Any())
+            {
+                return BadRequest("One or more devices have missing brand codes.");
+            }
+
+            addDeviceDTOList.ForEach(d => d.BrandCode = d.BrandCode.ToUpper());
+
+            var incomingBrandCodes = addDeviceDTOList.Select(d => d.BrandCode).ToList();
+
+            var existingBrandCodes = await _db.Devices
+                .Where(d => incomingBrandCodes.Contains(d.BrandCode))
+                .Select(d => d.BrandCode)
+                .ToListAsync();
+
+            if (existingBrandCodes.Any())
+            {
+                return Conflict($"Devices with the following brand codes already exist: {string.Join(", ", existingBrandCodes)}");
+            }
+
+            var random = new Random();
+
+            var existingIdentifiers = new HashSet<string>(
+                await _db.Devices.Select(d => d.DeviceUniqueIdentifier).ToListAsync()
+            );
+
+            foreach (var dto in addDeviceDTOList)
+            {
+                while (string.IsNullOrWhiteSpace(dto.DeviceIdentifier) || existingIdentifiers.Contains(dto.DeviceIdentifier))
+                {
+                    dto.DeviceIdentifier = "CU" + random.Next(10000, 99999).ToString();
+                }
+
+                existingIdentifiers.Add(dto.DeviceIdentifier);
+            }
+
+            var newDevices = addDeviceDTOList.Select(dto => new Device
+            {
+                BrandCode = dto.BrandCode,
+                Name = dto.Name,
+                DeviceUniqueIdentifier = dto.DeviceIdentifier,
+                RegistrationDate = DateTime.UtcNow
+            }).ToList();
+
+            await _db.Devices.AddRangeAsync(newDevices);
+            await _db.SaveChangesAsync();
+
+            var result = newDevices.Select(d => ToDeviceDTO(d)).ToList();
+
+            return Ok(result);
+        }
+
         [HttpPut("{id}")]
         public async Task<ActionResult> UpdateDevice(long id, UpdateDeviceDTO updateDevice)
         {
@@ -90,9 +161,9 @@ namespace AgroMonitor.Controllers
                 return NotFound("Device not found");
             }
 
-            device.BrandCode = updateDevice.BrandCode.ToUpperInvariant();
+            device.BrandCode = updateDevice.BrandCode.ToUpper();
             device.Name = updateDevice.Name;
-            device.DeviceUniqueIdentifier = updateDevice.DeviceIdentifier?? string.Empty;
+            device.DeviceUniqueIdentifier = updateDevice.DeviceIdentifier;
 
              _db.Devices.Update(device);
 
@@ -128,7 +199,7 @@ namespace AgroMonitor.Controllers
             {
                 Id = device.Id,
                 BrandCode = device.BrandCode,
-                DeviceUniqueIdentifier = device.DeviceUniqueIdentifier?? string.Empty,
+                DeviceUniqueIdentifier = device.DeviceUniqueIdentifier,
                 Name = device.Name,
                 RegistrationDate = device.RegistrationDate,
                 Readings = device.Readings.Select(r => new SensorReadingDTO
