@@ -92,7 +92,7 @@ namespace AgroMonitor.Controllers
             _db.SensorReadings.AddRange(readings);
             await _db.SaveChangesAsync();
 
-            //await _sensorReadingsProcessor.ProcessAsync(readings);
+            await _sensorReadingsProcessor.ProcessAsync(readings);
 
             return Ok(new
             {
