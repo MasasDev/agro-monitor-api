@@ -57,7 +57,7 @@ namespace AgroMonitor.Controllers
 
             Device newDevice = new Device
             {
-                BrandCode = addDeviceDTO.BrandCode,
+                BrandCode = addDeviceDTO.BrandCode.ToUpperInvariant(),
                 Name = addDeviceDTO.Name,
                 RegistrationDate = DateTime.UtcNow,
             };
@@ -66,6 +66,39 @@ namespace AgroMonitor.Controllers
             await _db.SaveChangesAsync();
 
             return CreatedAtAction(nameof(GetDevice), new { id = newDevice.Id }, newDevice.BrandCode);
+        }
+        [HttpPut("{id}")]
+        public async Task<ActionResult> UpdateDevice(long id, UpdateDeviceDTO updateDevice)
+        {
+            if (updateDevice == null)
+            {
+                return BadRequest("Payload is missing");
+            }
+
+            if(id != updateDevice.Id)
+            {
+                return BadRequest("The ID in the route does not match the ID in the payload.");
+            }
+
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
+            var device = await _db.Devices.FirstOrDefaultAsync(d => d.Id == id);
+
+            if(device == null)
+            {
+                return NotFound("Device not found");
+            }
+
+            device.BrandCode = updateDevice.BrandCode.ToUpperInvariant();
+            device.Name = updateDevice.Name;
+            device.DeviceUniqueIdentifier = updateDevice.DeviceIdentifier?? string.Empty;
+
+             _db.Devices.Update(device);
+
+            await _db.SaveChangesAsync();
+
+            return NoContent();
         }
 
         [HttpDelete("{id}")]
