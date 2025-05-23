@@ -2,6 +2,7 @@
 using AgroMonitor.Data;
 using AgroMonitor.DTOs;
 using AgroMonitor.Models;
+using AgroMonitor.Services.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -12,10 +13,12 @@ namespace AgroMonitor.Controllers
     public class SmsController : ControllerBase
     {
         private readonly ApplicationDbContext _db;
+        private readonly ISensorReadingsProcessor _sensorReadingsProcessor;
 
-        public SmsController(ApplicationDbContext db)
+        public SmsController(ApplicationDbContext db, ISensorReadingsProcessor sensorReadingsProcessor)
         {
             _db = db;
+            _sensorReadingsProcessor = sensorReadingsProcessor;
         }
 
         [HttpPost]
@@ -26,7 +29,7 @@ namespace AgroMonitor.Controllers
                 return BadRequest("No incoming message");
             }
 
-            String message = incomingMessage.Message;
+            String message = incomingMessage.Text;
 
             if (!message.ToLower().StartsWith("deviceid="))
             {
@@ -64,6 +67,8 @@ namespace AgroMonitor.Controllers
             await _db.SensorReadings.AddRangeAsync(readings);
             await _db.SaveChangesAsync();
 
+            await _sensorReadingsProcessor.ProcessAsync(readings);
+
             return Ok(new
             {
                 Device = device.Name,
@@ -74,26 +79,20 @@ namespace AgroMonitor.Controllers
 
         public class IncomingMessage
         {
-            [JsonPropertyName("smsId")]
-            public string SmsId { get; set; }
+            [JsonPropertyName("from")]
+            public string From { get; set; }
 
-            [JsonPropertyName("sender")]
-            public string Sender { get; set; }
+            [JsonPropertyName("text")]
+            public string Text { get; set; }
 
-            [JsonPropertyName("message")]
-            public string Message { get; set; }
+            [JsonPropertyName("sentStamp")]
+            public string SentStamp { get; set; }
 
-            [JsonPropertyName("receivedAt")]
-            public DateTime ReceivedAt { get; set; }
+            [JsonPropertyName("receivedStamp")]
+            public DateTime ReceivedStamp { get; set; }
 
-            [JsonPropertyName("deviceId")]
-            public string DeviceId { get; set; }
-
-            [JsonPropertyName("webhookSubscriptionId")]
-            public string WebhookSubscriptionId { get; set; }
-
-            [JsonPropertyName("webhookEvent")]
-            public string WebhookEvent { get; set; }
+            [JsonPropertyName("sim")]
+            public string Sim { get; set; }
         }
     }
 }
