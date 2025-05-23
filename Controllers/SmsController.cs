@@ -1,10 +1,10 @@
-﻿using System.Text.Json.Serialization;
-using AgroMonitor.Data;
-using AgroMonitor.DTOs;
+﻿using AgroMonitor.Data;
 using AgroMonitor.Models;
 using AgroMonitor.Services.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Newtonsoft.Json;
+using System.Text.Json;
 
 namespace AgroMonitor.Controllers
 {
@@ -20,43 +20,51 @@ namespace AgroMonitor.Controllers
             _db = db;
             _sensorReadingsProcessor = sensorReadingsProcessor;
         }
+        
 
         [HttpPost]
-        public async Task<ActionResult> ReceiveIncomingMessage([FromBody]IncomingMessage incomingMessage)
+        public async Task<ActionResult> ReceiveIncomingMessage([FromBody] JsonElement payload)
         {
-            if (incomingMessage == null)
+            if (!payload.TryGetProperty("data", out JsonElement data))
             {
-                return BadRequest("No incoming message");
+                return BadRequest("Missing 'data' field in the payload.");
             }
 
-            String message = incomingMessage.Text;
+            var sms = JsonConvert.DeserializeObject<SmsData>(data.ToString());
+
+            if (sms == null || string.IsNullOrWhiteSpace(sms.Content))
+            {
+                return BadRequest("Invalid or missing SMS content.");
+            }
+
+            string message = sms.Content;
 
             if (!message.ToLower().StartsWith("deviceid="))
             {
                 return BadRequest("First data field must be deviceId");
             }
 
-            string[] data = message.Split(new char[] { ';', ',' }, StringSplitOptions.RemoveEmptyEntries);
-
-            string extractedDeviceIdentifier = data[0].Substring(9, data[0].Length - 9);
+            string[] dataParts = message.Split(new char[] { ';', ',' }, StringSplitOptions.RemoveEmptyEntries);
+            string extractedDeviceIdentifier = dataParts[0].Substring(9);
 
             var device = await _db.Devices.FirstOrDefaultAsync(d => d.DeviceUniqueIdentifier == extractedDeviceIdentifier);
-
-            if(device == null)
+            if (device == null)
             {
-                return BadRequest("There is no device in the system with this id : " + extractedDeviceIdentifier);
+                return BadRequest("There is no device in the system with this id: " + extractedDeviceIdentifier);
             }
 
             List<SensorReading> readings = new List<SensorReading>();
 
-            for (int i = 1; i < data.Length; i++)
+            for (int i = 1; i < dataParts.Length; i++)
             {
-                string[] sensorData = data[i].Split(new char[] { '=' }, StringSplitOptions.RemoveEmptyEntries);
+                string[] sensorData = dataParts[i].Split(new char[] { '=' }, StringSplitOptions.RemoveEmptyEntries);
+                if (sensorData.Length != 2 || !double.TryParse(sensorData[1], out double value))
+                    continue; // Skip invalid pairs
 
                 SensorReading sensorReading = new SensorReading
                 {
                     SensorType = sensorData[0],
-                    SensorValue = double.Parse(sensorData[1]),
+                    SensorValue = value,
                     TimeStamp = DateTime.UtcNow,
                     DeviceId = device.Id,
                 };
@@ -66,7 +74,6 @@ namespace AgroMonitor.Controllers
 
             await _db.SensorReadings.AddRangeAsync(readings);
             await _db.SaveChangesAsync();
-
             await _sensorReadingsProcessor.ProcessAsync(readings);
 
             return Ok(new
@@ -76,23 +83,16 @@ namespace AgroMonitor.Controllers
                 Timestamp = DateTime.UtcNow
             });
         }
-
-        public class IncomingMessage
+        public class SmsData
         {
-            [JsonPropertyName("from")]
-            public string From { get; set; }
+            [JsonProperty("contact")]
+            public string Contact { get; set; } = string.Empty;
 
-            [JsonPropertyName("text")]
-            public string Text { get; set; }
+            [JsonProperty("owner")]
+            public string Owner { get; set; } = string.Empty;
 
-            [JsonPropertyName("sentStamp")]
-            public string SentStamp { get; set; }
-
-            [JsonPropertyName("receivedStamp")]
-            public DateTime ReceivedStamp { get; set; }
-
-            [JsonPropertyName("sim")]
-            public string Sim { get; set; }
+            [JsonProperty("content")]
+            public string Content { get; set; } = string.Empty;
         }
     }
 }

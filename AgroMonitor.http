@@ -434,3 +434,64 @@ GET {{AgroMonitor_HostAddress}}/api/device
 GET {{AgroMonitor_HostAddress}}/api/device/5
 
 ###
+POST {{AgroMonitor_HostAddress}}/api/sms
+Content-Type: application/json
+x-signature: sha256=7f0f827d-3a19-47f1-b91e-28fe79e5a4b7
+{
+  "smsId": "sms123",
+  "sender": "+123456789",
+  "message": "deviceId=dev001;temperature=25.5;humidity=67",
+  "receivedAt": "2025-05-23T12:00:00Z",
+  "deviceId": "dev001",
+  "webhookSubscriptionId": "webhook123",
+  "webhookEvent": "sms.received"
+}
+
+
+
+###
+
+POST {{AgroMonitor_HostAddress}}/api/sms
+Content-Type: application/json
+{
+  "smsId": "sms123",
+  "sender": "+123456789",
+  "message": "deviceId=dev001;temperature=25.5;humidity=67",
+  "receivedAt": "2025-05-23T12:00:00Z",
+  "deviceId": "dev001",
+  "webhookSubscriptionId": "webhook123",
+  "webhookEvent": "sms.received"
+}
+
+###
+
+POST {{AgroMonitor_HostAddress}}/api/sms
+Content-Type: application/json
+x-signature: 7f0f827d-3a19-47f1-b91e-28fe79e5a4b7
+
+{
+  "smsId": "smsId",
+  "sender": "+123456789",
+  "message": "message",
+  "receivedAt": "datetime",
+  "deviceId": "deviceId",
+  "webhookSubscriptionId": "webhookSubscriptionId",
+  "webhookEvent": "sms.received"
+}
+
+###
+
+POST {{AgroMonitor_HostAddress}}/api/sms
+Content-Type: application/json
+x-signature: 7f0f827d-3a19-47f1-b91e-28fe79e5a4b7
+{
+  "smsId": "smsId",
+  "sender": "+123456789",
+  "message": "message",
+  "receivedAt": "datetime",
+  "deviceId": "deviceId",
+  "webhookSubscriptionId": "webhookSubscriptionId",
+  "webhookEvent": "sms.received"
+}
+
+###
